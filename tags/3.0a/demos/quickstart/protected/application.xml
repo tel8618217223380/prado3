@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<application id="QuickStart" Mode="Debug">
+  <modules>
+    <module id="log" class="System.Log.TLogRouter">
+      <route class="TFileLogRoute" />
+    </module>
+  </modules>
+  <paths>
+    <using namespace="Application.controls.*" />
+  </paths>
+  <services>
+    <service id="page" class="TPageService" DefaultPage="GettingStarted.Introduction" />
+  </services>
+</application>

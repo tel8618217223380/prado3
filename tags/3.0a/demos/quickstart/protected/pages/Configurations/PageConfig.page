@@ -1,0 +1,36 @@
+<com:TContent ID="body" >
+
+<h1>Page Configurations</h1>
+<p>
+Page configurations are mainly used by <tt>TPageService</tt> to modify or append the application configuration. As the name indicates, a page configuration is associated with a directory storing some page files. It is stored as an XML file named <tt>config.xml</tt>.
+</p>
+<p>
+When a user requests a page stored under <tt>&lt;BasePath&gt;/dir1/dir2</tt>, the <tt>TPageService</tt> will try to parse and load <tt>config.xml</tt> files under <tt>&lt;BasePath&gt;/dir1</tt> and <tt>&lt;BasePath&gt;/dir1/dir2</tt>. Paths, modules, and parameters specified in these configuration files will be appended or merged into the existing application configuration.
+</p>
+<p>
+The format of a page configuration file is as follows,
+<com:TTextHighlighter Language="xml" CssClass="source">
+<configuration>
+  <paths>
+    <alias id="AliasID" path="AliasPath" />
+    <using namespace="Namespace" />
+  </paths>
+  <modules>
+    <module id="ModuleID" class="ModuleClass"  PropertyName="PropertyValue" ... />
+  </modules>
+  <authorization>
+    <allow pages="PageID1,PageID2" users="User1,User2" roles="Role1,Role2" verb="get" />
+    <deny pages="PageID1,PageID2" users="User1,User2" roles="Role1,Role2" verb="post" />
+  </authorization>
+  <pages PropertyName="PropertyValue" ...>
+    <page id="PageID" PropertyName="PropertyValue" ... />
+  </pages>
+  <parameters>
+    <parameter id="ParameterID" class="ParameterClass" PropertyName="PropertyValue" ... />
+  </parameters>
+</configuration>
+</com:TTextHighlighter>
+The <tt>&lt;paths&gt;</tt>, <tt>&lt;modules&gt;</tt> and <tt>&lt;parameters&gt;</tt> are similar to those in an application configuration. The <tt>&lt;authorization&gt;</tt> specifies the authorization rules that apply to the current page directory and all its subdirectories. It will be explained in more detail in future sections. The <tt>&lt;pages&gt;</tt> element specifies the initial values for the properties of pages. Each <tt>&lt;page&gt;</tt> element specifies the initial property values for a particular page identified by the <tt>id</code attribute. Initial property values given in the <tt>&lt;pages&gt;</tt> element apply to all pages in the current directory and all its subdirectories.
+</p>
+
+</com:TContent>

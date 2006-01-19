@@ -1,0 +1,57 @@
+<com:TContent ID="body">
+
+<h1>TRegularExpressionValidator Samples</h1>
+
+<table class="sampletable">
+
+<tr>
+<td class="samplenote">
+Regular expression validator with default settings:
+</td>
+<td class="sampleaction">
+<com:TTextBox ID="TextBox1" />
+<com:TRegularExpressionValidator
+	ValidationGroup="Group1"
+	ControlToValidate="TextBox1"
+	RegularExpression="\w+"
+	Text="Only word characters are allowed." />
+<com:TButton Text="Submit" ValidationGroup="Group1" />
+</td>
+</tr>
+
+<tr>
+<td class="samplenote">
+Regular expression validator with client-side validation disabled:
+</td>
+<td class="sampleaction">
+<com:TTextBox ID="TextBox2" />
+<com:TRegularExpressionValidator
+	ValidationGroup="Group2"
+	EnableClientScript="false"
+	ControlToValidate="TextBox2"
+	RegularExpression="\w+"
+	Text="Only word characters are allowed." />
+<com:TButton Text="Submit" ValidationGroup="Group2" />
+</td>
+</tr>
+
+<tr>
+<td class="samplenote">
+Regular expression validator with focus-on-error enabled and dynamic display:
+</td>
+<td class="sampleaction">
+<com:TTextBox ID="TextBox3" />
+<com:TRegularExpressionValidator
+	ValidationGroup="Group3"
+	ControlToValidate="TextBox3"
+	Display="Dynamic"
+	RegularExpression="\w+"
+	Text="Only word characters are allowed." />
+<com:TButton Text="Submit" ValidationGroup="Group3" />
+</td>
+</tr>
+
+
+</table>
+
+</com:TContent>
