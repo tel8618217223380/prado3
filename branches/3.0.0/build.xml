@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PRADO 3.0 build file - Copyright (C) 2006 PradoSoft
+
+  Requirements
+  ============
+  Phing >= 2.2.0RC1
+  xdebug >= 2.0.0beta4
+  PhpDocumentor >= 1.3.0RC5
+  PEAR >= 1.4.4
+-->
+<project name="prado" basedir="." default="dist">
+
+  <property name="version" value="3.0.0"/>
+  <property name="state" value="RC1"/>
+  <property name="pkgname" value="${phing.project.name}-${version}${state}"/>
+  <property name="pkgname.pear" value="${pkgname}${state}-pear"/>
+  <property name="src.dir" value="framework"/>
+  <property name="doc.dir" value="docs"/>
+  <property name="build.base.dir" value="build"/>
+  <property name="build.src.dir" value="${build.base.dir}/standard/${pkgname}"/>
+  <property name="build.pear.dir" value="${build.base.dir}/pear/${pkgname.pear}"/>
+  <property name="doc.build.dir" value="${build.base.dir}/docs/manual"/>
+  <property name="dist.base.dir" value="dist"/>
+  <property name="dist.zipfile" value="${dist.base.dir}/${pkgname}.zip"/>
+  <property name="dist.tarfile" value="${dist.base.dir}/${pkgname}.tar.gz"/>
+  <property name="dist.pearfile" value="${dist.base.dir}/${pkgname.pear}.tgz"/>
+  <property name="tests.dir" value="tests/unit"/>
+  <property name="reports.dir" value="${build.base.dir}/reports"/>
+  <property name="reports.unit.dir" value="${reports.dir}/unit"/>
+  <property name="reports.codecoverage.dir" value="${reports.dir}/codecoverage"/>
+  <property name="reports.style.dir" value="buildscripts/phing/style"/>
+  <property name="reports.geshi.dir" value="${src.dir}/3rdParty/geshi"/>
+  <property name="prado.lite" value="pradolite.php"/>
+  <property name="application.xsd" value="${doc.dir}/specs/application.xsd"/>
+  <property name="config.xsd" value="${doc.dir}/specs/config.xsd"/>
+  <property name="codecoverage" value="false"/>
+  <property name="zca" value="/usr/local/Zend/ZendStudioClient-5.1.0/bin/ZendCodeAnalyzer"/>
+
+  <taskdef name="phplint" classname="PhpLintTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="xmllint" classname="XmlLintTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="analyze" classname="ZendCodeAnalyzerTask" classpath="buildscripts/phing/tasks"/>
+
+  <!--
+      PHP Source Files in framework
+  -->
+  <fileset dir="." id="src">
+    <exclude name="${src.dir}/**/.svn"/>
+    <include name="${src.dir}/**/*.php"/>
+  </fileset>
+
+  <!--
+      Various resource files in framework
+  -->
+  <fileset dir="." id="res">
+    <exclude name="${src.dir}/**/.svn"/>
+    <include name="${src.dir}/**/*.html"/>
+    <include name="${src.dir}/**/*.css"/>
+    <include name="${src.dir}/**/*.txt"/>
+  </fileset>
+
+  <!--
+      Surrounding files
+  -->
+  <fileset dir="." id="misc">
+    <include name="COPYRIGHT"/>
+    <include name="HISTORY"/>
+    <include name="UPGRADE"/>
+    <include name="index.html"/>
+    <exclude name="requirements/.svn"/>
+    <include name="requirements/*"/>
+  </fileset>
+
+  <!--
+      Documentation
+  -->
+  <fileset dir="." id="docs">
+    <exclude name="${doc.dir}/**/.svn"/>
+    <include name="${doc.dir}/**/*"/>
+  </fileset>
+
+  <!--
+      Demos
+  -->
+  <fileset dir="." id="demos">
+    <exclude name="demos/**/.svn"/>
+    <include name="demos/**/*"/>
+  </fileset>
+
+  <target name="versioncheck" unless="version">
+    <echo message="====================================================="/>
+    <echo message="Version not specified. You must enter a version. In"/>
+    <echo message="the future you can add this to build.properties or"/>
+    <echo message="enter it on the command line: "/>
+    <echo message=" "/>
+    <echo message="-Dversion=3.0"/>
+    <echo message="====================================================="/>	
+    <input propertyname="version" promptChar=":">PRADO version for package</input>
+
+    <property name="pkgname" value="${phing.project.name}-${version}" override="true"/>
+    <property name="build.src.dir" value="${build.base.dir}/${pkgname}" override="true"/>
+    <property name="dist.zipfile" value="${build.base.dir}/${pkgname}.zip" override="true"/>
+    <property name="dist.tarfile" value="${build.base.dir}/${pkgname}.tar.gz" override="true"/>
+    <property name="dist.pearfile" value="${build.base.dir}/${pkgname}-pear.tgz" override="true"/>
+  </target>
+
+  <target name="lint" description="Check syntax of PHP source files">
+    <phplint>
+      <fileset refid="src"/>
+    </phplint>
+  </target>
+
+  <target name="lint-demos" description="Check syntax of demo files and configuration files">
+    <echo>Validate application configuration</echo>
+    <xmllint schema="${application.xsd}">
+      <fileset dir="demos">
+        <exclude name="**/.svn"/>
+        <include name="**/application.xml"/>
+      </fileset>
+    </xmllint>
+    <echo>Validate page configuration</echo>
+    <xmllint schema="${config.xsd}">
+      <fileset dir="demos">
+        <exclude name="**/.svn"/>
+        <include name="**/config.xml"/>
+      </fileset>
+    </xmllint>
+    <phplint>
+      <fileset dir="demos">
+        <exclude name="**/.svn"/>
+        <include name="**/*.php"/>
+      </fileset>
+    </phplint>
+  </target>
+
+  <target name="prepare" description="Prepare directory layout for build">
+    <phingcall target="clean"/>
+    <mkdir dir="${build.base.dir}"/>
+    <mkdir dir="${dist.base.dir}"/>
+    <mkdir dir="${reports.unit.dir}"/>
+    <mkdir dir="${reports.codecoverage.dir}"/>
+    <mkdir dir="${doc.build.dir}"/>
+  </target>
+
+  <target name="doc" description="Generate API documentation">
+    <delete dir="${doc.build.dir}"/>
+    <mkdir dir="${doc.build.dir}"/>
+    <phpdoc title="PRADO ${version}${state} API Documentation" destdir="${doc.build.dir}" sourcepath="${src.dir}" output="HTML:Smarty:PHP"/>
+  </target>
+
+  <target name="test" description="Run unit tests">
+    <echo>Preparing directory structure</echo>
+    <delete dir="${reports.unit.dir}"/>
+    <delete dir="${reports.codecoverage.dir}"/>
+    <mkdir dir="${reports.unit.dir}"/>
+
+    <if>
+      <equals arg1="${codecoverage}" arg2="true"/>
+      <then>
+	<mkdir dir="${reports.codecoverage.dir}"/>
+	<echo>Preparing Code Coverage Database</echo>
+	<coverage-setup database="${reports.codecoverage.dir}/coverage.db">
+	  <fileset dir="${src.dir}">
+	    <include name="**/*.php"/>
+	    <exclude name="Web/Javascripts/js/clientscripts.php"/>
+	    <exclude name="Data/TCache.php"/>
+	    <exclude name="DataAccess/**/*.php"/>
+	    <exclude name="I18N/core/Gettext/MO.php"/>
+	    <exclude name="I18N/core/Gettext/PO.php"/>
+	    <exclude name="I18N/core/util.php"/>
+	    <exclude name="I18N/TGlobalization.php"/>
+	    <exclude name="I18N/TGlobalizationAutoDetect.php"/>
+	    <exclude name="Security/TUserManager.php"/>
+	    <exclude name="Security/TMembershipManager.php"/>
+	    <exclude name="core.php"/>
+	    <exclude name="3rdParty/**/*.php"/>
+	    <exclude name="pradolite.php"/>
+	    <exclude name="prado.php"/>
+	  </fileset>
+	</coverage-setup>
+      </then>
+    </if>
+
+    <echo>Running Unit Tests</echo>
+    <phpunit2 codecoverage="${codecoverage}" haltonfailure="true" haltonerror="true" printsummary="true">
+      <batchtest>
+        <fileset dir="${tests.dir}">
+	  <include name="**/*Test.php"/>
+        </fileset>
+      </batchtest>
+      <formatter type="xml" todir="${reports.dir}" outfile="logfile.xml"/>
+    </phpunit2>
+
+    <echo>Creating Unit Test Report</echo>
+    <phpunit2report infile="${reports.dir}/logfile.xml" format="frames" styledir="${reports.style.dir}" todir="${reports.unit.dir}"/>
+
+    <if>
+      <equals arg1="${codecoverage}" arg2="true"/>
+      <then>
+	<echo>Creating Code Coverage Report</echo>
+	<coverage-report outfile="${reports.dir}/coverage.xml" geshipath="${reports.geshi.dir}" geshilanguagespath="${reports.geshi.dir}/geshi">
+	  <report todir="${reports.codecoverage.dir}" styledir="${reports.style.dir}"/>
+	</coverage-report>
+      </then>
+    </if>
+  </target>
+
+  
+  <target name="build-standard-package">
+    <echo>Building standard package...</echo>
+    <copy todir="${build.src.dir}">
+      <fileset refid="src"/>
+      <fileset refid="res"/>
+      <fileset refid="docs"/>
+      <fileset refid="misc"/>
+      <fileset refid="demos"/>
+      <fileset dir="${build.base.dir}">
+        <include name="docs/manual/**/*"/>
+	<include name="${prado.lite}"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="build" depends="versioncheck,prepare,doc,pradolite,build-standard-package" description="Creating the main PRADO build"/>
+
+  <target name="dist" depends="build" description="Create PRADO distributions">
+    <!--<tar compression="gzip" destFile="${dist.tarfile}" basedir="${build.base.dir}/standard"/>-->
+    <exec command="tar czvf ${pkgname}.tar.gz ${pkgname}" dir="${build.base.dir}/standard"/>
+    <move file="${build.base.dir}/standard/${pkgname}.tar.gz" tofile="${dist.tarfile}"/>
+    <!--<zip destfile="${dist.zipfile}" basedir="${build.base.dir}/standard"/>-->
+    <exec command="zip ${pkgname}.zip -r ${pkgname}/*" dir="${build.base.dir}/standard"/>
+    <move file="${build.base.dir}/standard/${pkgname}.zip" tofile="${dist.zipfile}"/>
+  </target>
+
+  <target name="all" depends="lint,lint-demos,test,build,dist" description="Run all targets"/>
+
+  <target name="clean">
+    <echo>Cleaning up the mess</echo>
+    <delete dir="${build.base.dir}"/>
+    <delete dir="${dist.base.dir}"/>
+  </target>
+
+  <target name="pradolite">
+    <echo>Compiling PRADO Lite</echo>
+    <delete file="${src.dir}/${prado.lite}"/>
+    <exec command="php build.php" dir="buildscripts/phpbuilder" passthru="true"/>
+    <phplint file="${src.dir}/${prado.lite}"/>
+  </target>
+  
+  <target name="analyze" description="Analyze PHP source files with Zend Code Analyzer">
+    <analyze analyzerPath="${zca}" disable="var-ref-notmodified,var-use-before-def,var-arg-unused,if-if-else">
+      <fileset refid="src"/>
+    </analyze>
+  </target>
+  
+</project>
