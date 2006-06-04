@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<application id="QuickStart" Mode="Debug">
+  <modules>
+    <!-- uncomment the following to enable caching
+    <module id="cache" class="System.Caching.TSqliteCache" />
+    -->
+    <!-- uncomment the following to enable logging to file
+    <module id="log" class="System.Util.TLogRouter">
+      <route class="TFileLogRoute" />
+    </module>
+    -->
+   <module id="quickstart_search" 
+    	class="Application.index.ZendSearch"
+    	IndexDataDirectory="Application.index.quickstart" />
+   <module id="api_search" 
+    	class="Application.index.ZendSearch"
+    	IndexDataDirectory="Application.index.api" />
+  </modules>
+  <paths>
+    <using namespace="Application.controls.*" />
+	<using namespace="Application.comments.*" />
+  </paths>
+  <services>
+    <service id="page" class="TPageService" DefaultPage="GettingStarted.Introduction" />
+  </services>
+</application>
