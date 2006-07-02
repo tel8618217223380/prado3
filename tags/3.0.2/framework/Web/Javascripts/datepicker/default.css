@@ -1,0 +1,98 @@
+.TDatePicker
+{
+	border: 1px solid #919EA9;
+	background-color: White;
+	text-align: center;
+	font-size: 11px;
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	cursor: default;
+}
+
+.TDatePickerButton
+{
+	width: 30px;
+}
+
+.TDatePickerImageButton
+{
+	padding: 2px;
+	border: 1px solid #919EA9;
+	vertical-align: top;
+	margin-left: 1px;
+}
+
+
+.TDatePickerImageButton:hover
+{
+	border-color: #ddd;
+}
+
+.TDatePicker select
+{
+	font-size: 11px;
+}
+
+.TDatePicker input.button
+{
+	font-size: 11px;
+	width: 32px;
+}
+
+.TDatePicker .date
+{
+	padding: 4px 0;
+	border: 1px solid white;
+	text-align: center;
+}
+.TDatePicker .hover
+{
+	border: 1px solid blue;
+}
+.TDatePicker .selected 
+{
+	background-color: blue;
+	border: 1px solid blue;
+	color: white;
+}
+.TDatePicker .today
+{
+	font-weight: bold;
+}
+
+.TDatePicker td.empty
+{
+	border: 1px solid white;
+	cursor: default;
+	height: 22px;
+}
+
+.TDatePicker th
+{
+	width: 28px;
+}
+
+.TDatePicker .calendarBody
+{
+	text-align: center;
+	width: 210px;
+	margin: 3px 6px;
+}
+
+.TDatePicker .grid
+{
+	border-spacing: 0px;
+}
+
+.TDatePicker .calendarFooter
+{
+	margin: 2px;
+	border-top: 1px solid #919EA9;
+	padding-top: 2px;
+}
+.TDatePicker .todayButton
+{
+	font-size: 11px;
+	margin: 4px;
+	padding-left: 1em;
+	padding-right: 1em;
+}
