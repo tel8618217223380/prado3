@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PRADO 3.1 build file - Copyright (C) 2006 PradoSoft
+
+  Requirements
+  ============
+  xdebug >= 2.0.0beta4
+-->
+<project name="prado" basedir="." default="help">
+  <taskdef name="prado-version-check" classname="PradoVersionTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="prado-doc" classname="PradoDocTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="prado-pear" classname="PradoPearTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="prado-quickstart-index" classname="QuickstartIndexTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="prado-api-index" classname="ManualIndexTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="prado-test" classname="PradoTestTask" classpath="buildscripts/phing/tasks"/>
+
+  <!-- generates ${prado.version} and ${prado.revision} -->
+  <prado-version-check />
+
+  <!-- these are required external commands -->
+  <property name="php" value="php" /> <!-- PHP parser -->
+  <property name="hhc" value="hhc" /> <!-- compile phpdoc into CHM -->
+  <property name="pdflatex" value="pdflatex" />  <!-- generates PDF from LaTex -->
+  <property name="zip" value="zip" />  <!-- zip compression -->
+
+  <property name="pkgname" value="${phing.project.name}-${prado.version}.r${prado.revision}"/>
+
+  <property name="build.base.dir" value="build"/>
+  <property name="build.dist.dir" value="${build.base.dir}/dist"/>
+  <property name="build.src.dir" value="${build.base.dir}/${pkgname}"/>
+  <property name="build.doc.dir" value="${build.base.dir}/docs"/>
+  <property name="build.pear.dir" value="${build.base.dir}/pear"/>
+  <property name="build.web.dir" value="${build.base.dir}/web"/>
+  <property name="build.test.dir" value="${build.base.dir}/test-reports"/>
+  <property name="build.coverage.dir" value="${build.base.dir}/code-coverage"/>
+  <property name="build.snapshot.dir" value="${build.base.dir}/snapshot"/>
+
+  <!--
+      All Source Files in framework
+  -->
+  <fileset dir="." id="framework">
+    <exclude name="**/.svn"/>
+    <exclude name="**/*.bak"/>
+    <exclude name="**/*~"/>
+    <exclude name="**/pradolite.php" /><!-- will be generated -->
+    <exclude name="**/prado-cli.php" /><!-- will be copied later -->
+    <exclude name="framework/Configuration/**" /><!-- not ready yet -->
+    <exclude name="framework/Web/UI/WebControls/Login*.*" /><!-- not ready yet -->
+    <exclude name="**/Web/Security/**" /><!-- not ready yet -->
+    <exclude name="**/TFeedService.php" /><!-- not ready yet -->
+    <exclude name="**/IFeedContentProvider.php" /><!-- not ready yet -->
+    <include name="framework/**/*"/>
+  </fileset>
+
+  <!--
+      Surrounding files
+  -->
+  <fileset dir="." id="misc">
+    <exclude name="**/.svn"/>
+    <exclude name="**/*.bak"/>
+    <exclude name="**/*~"/>
+    <include name="COPYRIGHT"/>
+    <include name="HISTORY"/>
+    <include name="UPGRADE"/>
+    <include name="index.html"/>
+    <include name="requirements/*"/>
+  </fileset>
+
+  <!--
+      Documentation ????
+  -->
+  <fileset dir="." id="docs">
+    <exclude name="**/.svn"/>
+    <exclude name="**/*.bak"/>
+    <exclude name="**/*~"/>
+    <exclude name="**/latex" />
+    <exclude name="**/sqlmap_tut.pdf" />
+    <include name="docs/specs/*"/>
+  </fileset>
+
+  <!--
+      Demos
+  -->
+  <fileset dir="." id="demos">
+    <exclude name="**/.svn"/>
+    <exclude name="**/*.bak"/>
+    <exclude name="**/*~"/>
+    <exclude name="**/runtime/*"/>
+    <exclude name="**/assets/*"/>
+    <exclude name="**/runtime/*/**"/>
+    <exclude name="**/assets/*/**"/>
+    <exclude name="demos/blog/protected/Data/Blog.db" />
+    <include name="demos/blog/**/*"/>
+    <include name="demos/chat/**/*"/>
+    <include name="demos/composer/**/*"/>
+    <include name="demos/currency-converter/**/*"/>
+    <include name="demos/helloworld/**/*"/>
+    <include name="demos/personal/**/*"/>
+    <include name="demos/quickstart/**/*"/>
+    <include name="demos/soap/**/*"/>
+    <include name="demos/sqlmap/**/*"/>
+    <include name="demos/time-tracker/**/*"/>
+  </fileset>
+
+  <!--
+  		Test tools
+  	-->
+  <fileset dir="." id="test-tools">
+    <include name="tests/test_tools/**/*"/>
+  </fileset>
+
+  <!--
+      Writable files and directories
+  -->
+  <fileset dir="." id="writables">
+    <include name="${build.src.dir}/demos/**/runtime" />
+    <include name="${build.src.dir}/demos/**/assets" />
+    <include name="${build.src.dir}/demos/blog/protected/Data" />
+  </fileset>
+
+  <target name="help">
+    <echo>
+
+    Welcome to use PRADO build script!
+    ----------------------------------
+    You may use the following command format to build a target:
+
+              phing   &lt;target name&gt;
+
+    where &lt;target name&gt; can be one of the following:
+
+    For all PRADO developers:
+    - test    : run unit tests (results are under /build/test-reports);
+    - js      : generate Javascript distribution files;
+
+    For PRADO release manager:
+    - dist    : create release files;
+    - build   : prepare a directory for distribution;
+    - clean   : clean up the build directory;
+    - rebuild : clean first and then build;
+    - docs    : generate documentation;
+    - pear    : generate PEAR packages;
+    - snapshot: generate nightly snapshot;
+    </echo>
+  </target>
+
+  <target name="build" depends="js" description="Building standard PRADO package v${prado.version}.${prado.revision}">
+    <echo>Building pradolite.php...</echo>
+    <delete file="framework/pradolite.php"/>
+    <exec command="${php} build.php" dir="buildscripts/phpbuilder" passthru="true"/>
+
+    <echo>Copying files to build directory...</echo>
+    <copy todir="${build.src.dir}">
+      <fileset refid="demos"/>
+      <fileset refid="docs"/>
+      <fileset refid="framework"/>
+      <fileset refid="misc"/>
+	  <fileset refid="test-tools" />
+    </copy> 
+
+    <copy file="buildscripts/classtree/DWExtensionReadme.txt" tofile="${build.src.dir}/editors/Dreamweaver/readme.txt" />
+    <copy file="framework/pradolite.php" tofile="${build.src.dir}/framework/pradolite.php" />
+    <copy file="framework/prado-cli.php" tofile="${build.src.dir}/framework/prado-cli.php" />
+
+    <echo>Changing file permissions...</echo>
+    <chmod mode="0777">
+      <fileset refid="writables" />
+    </chmod>
+
+    <echo>Building quickstart demo search indices...</echo>
+    <prado-quickstart-index todir="${build.src.dir}/demos/quickstart/protected/index/quickstart" />
+  </target>
+
+  <target name="clean">
+    <echo>Cleaning up the mess</echo>
+    <delete dir="${build.base.dir}"/>
+  </target>
+
+  <target name="rebuild" depends="clean,build" />
+
+  <target name="docs" depends="build">
+	<echo>Build PDF + CHM + HTML Docs, it may take about 30 mins</echo>
+
+	<echo>Building quickstart.pdf...</echo>
+    <delete>
+      <fileset dir=".">
+        <include name="buildscripts/texbuilder/quickstart/*.aux" />
+      </fileset>
+    </delete>
+    <exec command="${php} build.php" dir="buildscripts/texbuilder/quickstart" passthru="true"/>
+    <exec command="${pdflatex} quickstart.tex -interaction=nonstopmode -max-print-line=120" dir="buildscripts/texbuilder/quickstart" passthru="true"/>
+    <exec command="${pdflatex} quickstart.tex -interaction=nonstopmode -max-print-line=120" dir="buildscripts/texbuilder/quickstart" passthru="true"/>
+    <exec command="${pdflatex} quickstart.tex -interaction=nonstopmode -max-print-line=120" dir="buildscripts/texbuilder/quickstart" passthru="true"/>
+    <move file="buildscripts/texbuilder/quickstart/quickstart.pdf" todir="${build.doc.dir}"/>
+
+	<echo>Building API manuals...</echo>
+    <delete dir="${build.doc.dir}/manual"/>
+    <mkdir dir="${build.doc.dir}/manual" />
+    <prado-doc phpdoc="${php} buildscripts/PhpDocumentor/phpdoc"
+               title="PRADO v${prado.version} API Manual"
+               destdir="${build.doc.dir}/manual"
+               sourcepath="${build.src.dir}/framework"
+               ignorelist="*pradolite.php,*prado-cli.php,*3rdParty/*,*Javascripts/*,*I18N/core/*"
+               output="HTML:frames:default,CHM:default:default,HTML:Smarty:PradoSoft" />
+
+    <echo>Indexing API manuals...</echo>
+    <prado-api-index docdir="${build.doc.dir}/manual/HTMLSmartyConverter" todir="${build.doc.dir}/manual/HTMLSmartyConverter" />
+
+    <copy file="buildscripts/index/search.php" todir="${build.doc.dir}/manual/HTMLSmartyConverter" />
+
+	<exec command="${php} build.php" dir="buildscripts/classtree" passthru="true"/>
+
+	<echo>Generating CHM Content (Quickstart + ClassDocs)</echo>
+	<exec command="${php} build.php" dir="buildscripts/chmbuilder" passthru="true"/>
+	<!-- done on project website 
+	<echo>Generating CHM Content (WIKI)</echo>
+	<exec command="${php} build.php" dir="buildscripts/wikibuilder" passthru="true"/>
+	-->
+    <if>
+      <equals arg1="${prado.winbuild}" arg2="true"/>
+      <then>
+        <exec command="${hhc} ${build.doc.dir}/prado3_manual.hhp" />
+      </then>
+    </if>
+  </target>
+
+  <target name="dist" depends="rebuild,docs">
+    <echo>Moving doc files to build...</echo>
+    <mkdir dir="${build.dist.dir}" />
+    <move file="${build.doc.dir}/quickstart.pdf" todir="${build.src.dir}/docs" />
+    <move todir="${build.src.dir}/docs/manual">
+      <fileset dir="${build.doc.dir}/manual/HTMLframesConverter">
+        <include name="**/**" />
+      </fileset>
+    </move>
+    <if>
+      <equals arg1="${prado.winbuild}" arg2="true"/>
+      <then>
+        <move file="${build.doc.dir}/prado3_manual.chm" tofile="${build.src.dir}/docs/prado3_manual.chm" />
+      </then>
+    </if>
+
+    <echo>Generating compressed distribution files...</echo>
+    <if>
+      <equals arg1="${prado.winbuild}" arg2="false"/>
+      <then>
+        <exec command="tar czvf ${pkgname}.tar.gz ${pkgname}" dir="${build.base.dir}"/>
+        <move file="${build.base.dir}/${pkgname}.tar.gz" todir="${build.dist.dir}" />
+      </then>
+    </if>
+    <exec command="zip ${pkgname}.zip -r ${pkgname}" dir="${build.base.dir}" />
+    <move file="${build.base.dir}/${pkgname}.zip" todir="${build.dist.dir}" />
+
+	<echo>Generating files for pradosoft.com...</echo>
+    <echo>Compiling class docs...</echo>
+    <exec command="${php} build.php" dir="buildscripts/classtree" passthru="true"/>
+    <move file="buildscripts/classtree/classes.data" todir="${build.web.dir}/protected/Data" />
+
+    <echo>Moving HTML docs to Web folder...</echo>
+    <mkdir dir="${build.web.dir}" />
+    <move todir="${build.web.dir}/docs/manual">
+      <fileset dir="${build.doc.dir}/manual/HTMLSmartyConverter">
+        <include name="**/**" />
+      </fileset>
+    </move>
+
+    <echo>
+
+
+                   Distribution Not Completed Yet!!!
+
+The following steps need to be manually performed in order to complete
+the PRADO distribution:
+
+1. Package DreamWeaver extension by running DW extension manager with
+   buildscripts/classtree/PRADO.mxi and saving the generated file as
+   "${build.src.dir}/editors/Dreamweaver/PRADO.mxp"
+
+2. If building on Linux, the CHM doc file needs to be generated by compiling
+   "${build.doc.dir}/manual/CHMdefaultConverter/phpdoc.hhp"
+   and saving the generated file as
+   "${build.src.dir}/docs/manual.chm"
+
+3. Use winzip (on Windows) and gzip (on Linux) to generate the compressed
+   release files of the direcotry
+   "${build.src.dir}".
+
+    </echo>
+  </target>
+
+  <target name="js" description="Compiling Javascript distribution files">
+    <delete file="framework/Web/Javascripts/js/*.js" />
+    <exec command="${php} build.php" dir="buildscripts/jsbuilder" passthru="true"/>
+  </target>
+
+  <target name="test" description="Running unit tests">
+    <delete dir="${build.test.dir}"/>
+    <mkdir dir="${build.test.dir}"/>
+    <prado-test codecoverage="false" haltonfailure="false" haltonerror="false" printsummary="true">
+      <batchtest>
+        <fileset dir="tests/unit">
+	      <include name="**/*Test.php"/>
+        </fileset>
+      </batchtest>
+      <formatter type="xml" todir="${build.test.dir}" outfile="unit-tests.xml"/>
+    </prado-test>
+    <phpunit2report infile="${build.test.dir}/unit-tests.xml" format="frames" styledir="buildscripts/phing/style" todir="${build.test.dir}"/>
+  </target>
+
+  <target name="snapshot" depends="rebuild">
+    <echo>Generating compressed distribution files...</echo>
+    <if>
+      <equals arg1="${prado.winbuild}" arg2="false"/>
+      <then>
+        <exec command="tar czvf ${pkgname}.tar.gz ${pkgname}" dir="${build.base.dir}"/>
+        <move file="${build.base.dir}/${pkgname}.tar.gz" todir="${build.dist.dir}" />
+      </then>
+    </if>
+    <exec command="zip ${pkgname}.zip -r ${pkgname}" dir="${build.base.dir}" />
+    <move file="${build.base.dir}/${pkgname}.zip" tofile="${build.snapshot.dir}/prado-latest.zip" />
+    <copy file="${build.src.dir}/HISTORY" tofile="${build.snapshot.dir}/changelog-latest.txt" />
+  </target>
+
+<!--
+  <taskdef name="phplint" classname="PhpLintTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="xmllint" classname="XmlLintTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="analyze" classname="ZendCodeAnalyzerTask" classpath="buildscripts/phing/tasks"/>
+  <taskdef name="pear-package" classname="BuildPradoPEARPackageTask" classpath="buildscripts/phing/tasks"/>
+
+  <target name="pear" depends="" description="Creating PEAR package">
+    <mkdir dir="${build.pear.dir}" />
+    <prado-pear pkgdir="${build.pear.dir}"
+                channel="pear.php.net"
+                version="${prado.version}"
+                state="stable"
+                category="framework"
+                package="prado"
+                summary="PRADO is a ...."
+                pkgdescription="detailed description..."
+                notes="www.pradosoft.com"
+                license="BSD"
+                />
+  </target>
+  <target name="test" description="Run unit tests">
+    <echo>Preparing directory structure</echo>
+    <delete dir="${reports.dir}"/>
+    <mkdir dir="${reports.dir}"/>
+    <delete dir="${reports.unit.dir}"/>
+    <delete dir="${reports.codecoverage.dir}"/>
+ 
+    <if>
+      <equals arg1="${codecoverage}" arg2="true"/>
+      <then>
+	<mkdir dir="${reports.codecoverage.dir}"/>
+	<echo>Preparing Code Coverage Database</echo>
+	<coverage-setup database="${reports.codecoverage.dir}/coverage.db">
+	  <fileset dir="${src.dir}">
+	    <include name="**/*.php"/>
+	    <exclude name="Web/Javascripts/js/clientscripts.php"/>
+	    <exclude name="Data/TCache.php"/>
+	    <exclude name="DataAccess/**/*.php"/>
+	    <exclude name="I18N/core/Gettext/MO.php"/>
+	    <exclude name="I18N/core/Gettext/PO.php"/>
+	    <exclude name="I18N/core/util.php"/>
+	    <exclude name="I18N/TGlobalization.php"/>
+	    <exclude name="I18N/TGlobalizationAutoDetect.php"/>
+	    <exclude name="Security/TUserManager.php"/>
+	    <exclude name="Security/TMembershipManager.php"/>
+	    <exclude name="core.php"/>
+	    <exclude name="3rdParty/**/*.php"/>
+	    <exclude name="pradolite.php"/>
+	    <exclude name="prado.php"/>
+	  </fileset>
+	</coverage-setup>
+      </then>
+    </if>
+
+    <echo>Running Unit Tests</echo>
+    <phpunit2 codecoverage="${codecoverage}" haltonfailure="false" haltonerror="false" printsummary="true">
+      <batchtest>
+        <fileset dir="${tests.dir}">
+	  <include name="**/*Test.php"/>
+        </fileset>
+      </batchtest>
+      <formatter type="xml" todir="${reports.dir}" outfile="logfile.xml"/>
+    </phpunit2>
+
+    <echo>Creating Unit Test Report</echo>
+	 <mkdir dir="${reports.unit.dir}"/>
+     <phpunit2report infile="${reports.dir}/logfile.xml" format="frames" styledir="${reports.style.dir}" todir="${reports.unit.dir}"/>
+
+    <if>
+      <equals arg1="${codecoverage}" arg2="true"/>
+      <then>
+	<echo>Creating Code Coverage Report</echo>
+	<coverage-report outfile="${reports.dir}/coverage.xml" geshipath="${reports.geshi.dir}" geshilanguagespath="${reports.geshi.dir}/geshi">
+	  <report todir="${reports.codecoverage.dir}" styledir="${reports.style.dir}"/>
+	</coverage-report>
+      </then>
+    </if>
+  </target>
+
+  <target name="lint" description="Check syntax of PHP source files">
+    <phplint>
+      <fileset refid="src"/>
+    </phplint>
+  </target>
+
+  <target name="lint-demos" description="Check syntax of demo files and configuration files">
+    <echo>Validate application configuration</echo>
+    <xmllint schema="${application.xsd}">
+      <fileset dir="demos">
+        <exclude name="**/.svn"/>
+        <include name="**/application.xml"/>
+      </fileset>
+    </xmllint>
+    <echo>Validate page configuration</echo>
+    <xmllint schema="${config.xsd}">
+      <fileset dir="demos">
+        <exclude name="**/.svn"/>
+        <include name="**/config.xml"/>
+      </fileset>
+    </xmllint>
+    <phplint>
+      <fileset dir="demos">
+        <exclude name="**/.svn"/>
+        <include name="**/*.php"/>
+      </fileset>
+    </phplint>
+  </target>
+  <target name="build-pear-package">
+    <echo>Preparing files for PEAR package...</echo>
+    <delete dir="${build.pear.dir}"/>
+    <mkdir dir="${build.pear.dir}"/>
+    <copy todir="${build.pear.dir}">
+      <fileset refid="framework"/>
+      <fileset dir="${build.base.dir}">
+	<include name="${prado.lite}"/>
+      </fileset>
+    </copy>
+
+    <echo>Creating package.xml...</echo>
+    <pear-package dir="${build.pear.dir}" destFile="${build.base.dir}/pear/package.xml" version="${version}" state="${pear.state}" notes="${notes}">
+      <fileset refid="framework"/>
+      <fileset dir="${build.base.dir}">
+	<include name="${prado.lite}"/>
+      </fileset>
+    </pear-package>
+  </target>
+  <target name="dist-pear" depends="build-pear-package" description="Create PRADO PEAR package">
+    <delete file="${dist.pearfile}"/>
+    <mkdir dir="${dist.base.dir}"/>
+    <exec command="pear package" dir="${build.pear.dir}" passthru="true"/>
+    <move file="${build.pear.dir}/prado3-${version}.tgz" tofile="${dist.pearfile}"/>
+  </target>
+  <target name="analyze" description="Analyze PHP source files with Zend Code Analyzer">
+    <analyze analyzerPath="${zca}" disable="var-ref-notmodified,var-use-before-def,var-arg-unused,if-if-else">
+      <fileset refid="src"/>
+    </analyze>
+  </target>
+
+  <target name="install" description="Install PEAR package locally">
+    <exec command="sudo pear install ${dist.pearfile}" dir="." passthru="true"/>
+  </target>
+
+  <target name="uninstall" description="Uninstall PEAR package locally">
+    <exec command="sudo pear uninstall pear.pradosoft.com/prado3" dir="." passthru="true"/>
+  </target>
+-->
+</project>
