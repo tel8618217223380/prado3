@@ -111,6 +111,10 @@
   <a href="?page=Controls.SafeHtml">TSafeHtml</a> displays its body content with assurance that the content contain no harmful code (such as <a href="?page=Advanced.Security">XSS</a>).
   </li>
 
+  <li>*
+  <a href="?page=Controls.Slider">TSlider</a> represents a Slider control
+  </li>
+  
   <li>
   <a href="?page=Controls.Statements">TStatements</a> accepts a few PHP statements and displays their standard output on the Web page.
   </li>

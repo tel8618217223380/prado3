@@ -1,0 +1,13 @@
+<com:TContent ID="body" >
+
+<h1 id="4401">TSlider</h1>
+<com:DocLink ClassPath="System.Web.UI.WebControls.TSlider" />
+
+<p id="510314" class="block-content">
+<tt>TSlider</tt> displays a slider on a page
+</p>
+
+<p>To be continued...</p>
+<com:RunBar PagePath="Controls.Samples.TSlider.Home" />
+
+<div class="last-modified">$Id$</div></com:TContent>
