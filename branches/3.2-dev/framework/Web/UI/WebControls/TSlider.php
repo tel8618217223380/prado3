@@ -151,7 +151,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 */
 	public function getValue()
 	{
-		return $this->getViewState('Value',0);
+		return $this->getViewState('Value',0.0);
 	}
 
 	/**
@@ -159,7 +159,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 */
 	public function setValue($value)
 	{
-		$this->setViewState('Value', TPropertyValue::ensureFloat($value),0);
+		$this->setViewState('Value', TPropertyValue::ensureFloat($value),0.0);
 	}
 
 	/**
@@ -299,7 +299,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 */
 	public function loadPostData($key,$values)
 	{
-		$value=$values[$this->getClientID().'_1'];
+		$value=(float)$values[$this->getClientID().'_1'];
 		if($this->getValue()!==$value)
 		{
 			$this->setValue($value);
