@@ -13,37 +13,37 @@
 /**
  * TSlider class
  *
- * TODO: Class Documentation
+ * TSlider displays a slider for numeric input purpose. A slider consists of a 'track', 
+ * which define the range of possible value, and a 'handle' which can slide on the track, to select 
+ * a value in the range. The track can be either Horizontal or Vertical, depending of the {@link SetDirection Direction}
+ * property. By default, it's horizontal.
  *
- * Quick ex :
- *
- * <com:TSlider id="hSlider" AutoPostBack="true" HandleType="Image" Axis="Horizontal" Enabled="true" Width="200px" Minimum="0" Maximum="100" OnSliderChanged="sliderChanged">
- *	<prop:ClientSide.onSlide>
- * 		$('hslidervalue').innerHTML = value;
- * 	</prop:ClientSide.onSlide>
- * </com:TSlider>
- * Value  : <span id="hslidervalue"><%=$this->slider->value%></span>
- *
- * Properties :
- * AutoPostBack=true ==> postback occured if slider changes.
- * HandleType ==> "Cursor" or "Image" or "Custom"
- * 		"Cursor" : display a simple cursor as handle on the track (see TSliderHandleCursor)
- * 		"Image" : display an image as handle on the track (see TSliderHandleImage)
- * 		"Custom" : Use a custom control as handle (extends from TSliderHandle, and specify with HandleClass Property)
- * Axis ==> Horizontal or Vertical
- * Width ==> Width of track
- * Height ==> Height of track
- * Minimum & Maximum => min & max values
- * Values ==> Allowed values (default = all values between Minimum and Maximum)
- *
- * Handle.* ==> Properties for handle (widht, height, color for Cursor, Width, Height, ImageUrl for Image)
- *
- * CssClass => Track Css Class. Defaults to 'slider'. The classname is appended with -horitontal or -vertical depending on the Direction.
- * Events :
- * ClientSide.onSlide : JS code to be executed when cursor is slided
- * ClientSide.onChange : JS code to be executed when the value has changed
- * onSliderChanged : Serverside Event raised on postback when value has changed.
- *
+ * The range boundaries is defined by {@link SetMinValue MinValue} and {@link SetMaxValue MaxValue} properties. 
+ * The default range is from 0 to 100. 
+ * The {@link SetStepSize StepSize} property can be used to define the <b>step</b> between 2 values inside the range.
+ * Notice that this step will be recomputed if there is more than 200 values between the range boundaries.
+ * You can also provide the allowed values by setting the {@link SetValues Values} array.
+ * 
+ * The handle sub-properties can be accessed by {@link GetHandle Handle} property. You can also provide your own control
+ * for the handle, using {@link SetHandleClass HandleClass} property. Note that this class must be a subclass of 
+ * {@link TSliderHandle}
+ * 
+ * The TSlider control can be easily customized using CssClasses. You can provide your own css file, using the 
+ * {@link SetCssUrl CssUrl} property.
+ * The css class for TSlider can be set by the {@link setCssClass CssClass} property. Defaults values are "hslider" for
+ * an Horizontal slider, or "vslider" for a Vertical one. 
+ * The css class for the Handle can be set by the <b>Handle.CssClass</b> subproperty. Defaults is "handle", which just
+ * draw a red block as a cursor. 'handle-image' css class is also provided for your convenience, which display an image
+ * as the handle.
+ * 
+ * If {@link SetAutoPostBack AutoPostBack} property is true, postback is sent as soon as the value changed.
+ * 
+ * TSlider raises the {@link onValueChanged} event when the value of the slider has changed during postback.
+ * 
+ * You can also attach ClientSide javascript events handler to the slider :
+ * - ClientSide.onSlide is called when the handle is slided on the track. You can get the current value in the <b>value</b>
+ * javascript variable. You can use this event to update on client side a label with the current value
+ * - ClientSide.onChange is called when the slider value has changed (at the end of a move). 
  *
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
  * @version $Id$
@@ -556,6 +556,11 @@ class TSliderHandle extends TWebControl
 {
 	private $_track;
 
+	/**
+	 * Override parent constructor to get the track control as parameter
+	 *
+	 * @param TSlider track control
+	 */
 	public function __construct ($track)
 	{
 		if ($track instanceof TSlider)
@@ -566,6 +571,9 @@ class TSliderHandle extends TWebControl
 		}
 	}
 
+	/**
+	 * @return TSlider track control
+	 */
 	public function getTrack() {
 		return $this->_track;
 	}
@@ -583,7 +591,11 @@ class TSliderHandle extends TWebControl
 		$class=parent::getCssClass();
 		return ($class=='')?'handle':$class;
 	}
-
+	
+	/**
+	 * Add the specified css classes to the handle
+	 * @param THtmlWriter writer
+	 */
 	public function addAttributesToRender($writer)
 	{
 		parent::addAttributesToRender($writer);

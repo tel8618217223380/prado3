@@ -48,7 +48,6 @@ $packages = array(
 
 	'slider'=>array(
 		'scriptaculous/slider.js',
-		'prado/slider/slider.js'
 	),
 );
 
