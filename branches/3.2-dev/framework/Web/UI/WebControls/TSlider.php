@@ -57,11 +57,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 * @var TSliderHandle handle component
 	 */
 	private $_handle;
-	/**
-	 * @var string Custom handle class name
-	 */
-	private $_handleClass;
-	/**
+	/*
 	 * @var boolean Wether the data has changed during postback
 	 */
 	private $_dataChanged=false;
@@ -83,7 +79,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 */
 	public function setDirection($value)
 	{
-		$this->setViewState('Direction', TPropertyValue::ensureEnum($value,TSliderDirection));
+		$this->setViewState('Direction', TPropertyValue::ensureEnum($value,'TSliderDirection'));
 	}
 
 	/**
@@ -103,39 +99,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	}
 
 	/**
-	 * @return string CssClass for an horizontal track of the slider control. Defaults to 'hslider'
-	 */
-	public function getHorizontalCssClass ()
-	{
-		return $this->getViewState('HorizontalCssClass', 'hslider');
-	}
-
-	/**
-	 * @param string CssClass for an horizontal track of the slider control. Defaults to 'hslider'
-	 */
-	public function setHorizontalCssClass ($value)
-	{
-		$this->setViewState('HorizontalCssClass', $value, 'hslider');
-	}
-
-	/**
-	 * @return string CssClass for a vertical track of the slider control. Defaults to 'slider'
-	 */
-	public function getVerticalCssClass ()
-	{
-		return $this->getViewState('VerticalCssClass', 'vslider');
-	}
-
-	/**
-	 * @param string CssClass for a vertical track of the slider control. Defaults to 'vslider'
-	 */
-	public function setVerticalCssClass ($value)
-	{
-		$this->setViewState('VerticalCssClass', $value, 'vslider');
-	}
-
-	/**
-	 * @return int Maximum value for the slider
+	 * @return float Maximum value for the slider
 	 */
 	public function getMaxValue()
 	{
@@ -143,20 +107,15 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	}
 
 	/**
-	 * @param int Maximum value for slider
+	 * @param float Maximum value for slider
 	 */
 	public function setMaxValue($value)
 	{
-		$value=TPropertyValue::ensureInteger($value);
-		// Should I ensure the values are the same than the allowed values ?
-		/*
-		if (($values=$this->getValues())!==null && $value != max($values)) $value=max($values);
-		*/
-		$this->setViewState('MaxValue', $value,100);
+		$this->setViewState('MaxValue', TPropertyValue::ensureFloat($value),100);
 	}
 
 	/**
-	 * @return int Minimum value for slider
+	 * @return float Minimum value for slider
 	 */
 	public function getMinValue()
 	{
@@ -164,18 +123,29 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	}
 
 	/**
-	 * @param int Minimum value for slider
+	 * @param float Minimum value for slider
 	 */
 	public function setMinValue($value)
 	{
-		$value=TPropertyValue::ensureInteger($value);
-		// Should I ensure the values are the same than the allowed values ?
-		/*
-		if (($values=$this->getValues())!==null && $value != min($values)) $value=min($values);
-		*/
-		$this->setViewState('MinValue', $value,0);
+		$this->setViewState('MinValue', TPropertyValue::ensureFloat($value),0);
 	}
 
+	/**
+	 * @return float Step size. Defaults to 1
+	 */
+	public function getStepSize()
+	{
+		return $this->getViewState('StepSize', 1);
+	}
+	
+	/**
+	 * @param float Step size. Defaults to 1.
+	 */
+	public function setStepSize($value)
+	{
+		$this->setViewState('StepSize', $value, 1);
+	}
+	
 	/**
 	 * @return float current value of slider
 	 */
@@ -207,28 +177,8 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	{
 		$value=TPropertyValue::ensureArray($value);
 		$this->setViewState('Values', $value, null);
-		// Should I ensure Min/MaxValue are correct ???
-		/* 
-		if ($this->getMinValue() < min($value)) $this->setMinValue(min($value));
-		if ($this->getMaxValue() > max($value)) $this->setMaxValue(max($value));
-		*/ 
 	}
 
-	/**
-	 * @return int number of decimals for the value. Defaults to 0
-	 */
-	public function getDecimals()
-	{
-		return $this->getViewState("Decimals", 0);
-	}
-
-	/**
-	 * @param int number of decimas for the value. Defaults to 0.
-	 */
-	public function setDecimals($value)
-	{
-		$this->setViewState ('Decimals', TPropertyValue::ensureInteger($value), 0);
-	}
 
 	/**
 	 * This method will return the handle control.
@@ -253,7 +203,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 */
 	public function getHandleClass ()
 	{
-		return $this->_handleClass?$this->_handleClass:TSliderHandle;
+		return $this->getViewState('HandleClass', 'TSliderHandle');
 	}
 
 	/**
@@ -266,7 +216,7 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 		$handle=prado::createComponent($value, $this);
 		if ($handle instanceof TSliderHandle)
 		{
-			$this->_handleClass=$value;
+			$this->setViewState('HandleClass', $value);
 			$this->_handle=$handle;
 		} else {
 			throw new TInvalidDataTypeException('slider_handle_class_invalid', get_class($this->_handle));
@@ -324,20 +274,20 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 */
 	public function raisePostDataChangedEvent()
 	{
-		$this->onSliderChanged(null);
+		$this->onValueChanged(null);
 	}
 
 	/**
-	 * Raises <b>OnSliderChanged</b> event.
+	 * Raises <b>OnValueChanged</b> event.
 	 * This method is invoked when the {@link getValue Value}
 	 * property changes on postback.
 	 * If you override this method, be sure to call the parent implementation to ensure
 	 * the invocation of the attached event handlers.
 	 * @param TEventParameter event parameter to be passed to the event handlers
 	 */
-	public function onSliderChanged($param)
+	public function onValueChanged($param)
 	{
-		if ($this->getDataChanged()) $this->raiseEvent('OnSliderChanged',$this,$param);
+		if ($this->getDataChanged()) $this->raiseEvent('OnValueChanged',$this,$param);
 	}
 
 	/**
@@ -409,11 +359,10 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	 */
 	protected function addAttributesToRender($writer)
 	{
-
-		$writer->addAttribute('id',$this->getClientID());
-		$class=($this->getDirection()==TSliderDirection::Horizontal)?$this->getHorizontalCssClass():$this->getVerticalCssClass();
-		$writer->addAttribute('class', $class);
 		parent::addAttributesToRender($writer);
+		$writer->addAttribute('id',$this->getClientID());
+		if ($this->getCssClass()==='') 
+			$writer->addAttribute('class', $this->getDirection()===TSliderDirection::Horizontal?'hslider':'vslider');
 	}
 
 	/**
@@ -468,16 +417,42 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 		$options['AutoPostBack'] = $this->getAutoPostBack();
 
 		// Slider Control options
+		$minValue=$this->getMinValue();
+		$maxValue=$this->getMaxValue();
 		$options['axis'] = strtolower($this->getDirection());
-		$options['maximum'] = $this->getMaxValue();
-		$options['minimum'] = $this->getMinValue();
-		$options['range'] = 'javascript:$R('.$this->getMinValue().",".$this->getMaxValue().")";
+		$options['maximum'] = $maxValue;
+		$options['minimum'] = $minValue;
+		$options['range'] = 'javascript:$R('.$minValue.",".$maxValue.")";
 		$options['sliderValue'] = $this->getValue();
 		$options['disabled'] = !$this->getEnabled();
 		if (($values=$this->getValues()))
+		{
+			// Values are provided. Check if min/max are present in them
+			if (!in_array($minValue, $values)) $values[]=$minValue;
+			if (!in_array($maxValue, $values)) $values[]=$maxValue;
+			// Remove all values outsize the range [min..max]
+			foreach ($values as $idx=>$value)
+			{
+				if ($value < $minValue) unset ($values[$idx]);
+				if ($value > $maxValue) unset ($values[$idx]);
+			}
+		} 
+		else
+		{
+			// Values are not provided, generate automatically using stepsize
+			$step=$this->getStepSize();
+			// We want at most 200 values, so, change the step if necessary
+			if (($maxValue-$minValue)/$step > 200)
+			{
+				$step=($maxValue-$minValue)/200;
+			}
+			$values=array();
+			for ($i=$minValue;$i<=$maxValue;$i+=$step)
+				$values[]=$i;
+			// Add max if it's not in the array because of step
+			if (!in_array($maxValue, $values)) $values[]=$maxValue;
+		} 
 		$options['values'] = TJavascript::Encode($values,false);
-		$options['decimals'] = $this->getDecimals();
-			
 		if(!is_null($this->_clientScript))
 			$options = array_merge($options,$this->_clientScript->getOptions()->toArray());
 		return $options;

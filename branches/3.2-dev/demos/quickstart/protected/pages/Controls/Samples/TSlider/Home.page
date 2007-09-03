@@ -3,7 +3,7 @@
 <p>Description here</p>
 
 <p>Horizontal slider, with image handle, Javascript 'onSlide' handler, ServerSide 'onSliderChanged' handler and autopostback=true</p>
-<com:TSlider id="hSlider" AutoPostBack="true" Handle.CssClass="handle-image" Direction="Horizontal" Enabled="true" MinValue="0" MaxValue="100" OnSliderChanged="sliderChanged">
+<com:TSlider id="hSlider" AutoPostBack="true" Handle.CssClass="handle-image" Direction="Horizontal" Enabled="true" MinValue="0" MaxValue="1" StepSize="0.1" OnValueChanged="sliderChanged">
 	<prop:ClientSide.onSlide>
 		$('hslidervalue').innerHTML = value;
 	</prop:ClientSide.onSlide>
@@ -13,11 +13,11 @@
 <p>
 Vertical slider, cursor handle, no auto postback, no event handler
 </p>
-<com:TSlider id="vSlider" Direction="Vertical" Enabled="true" Height="200px" Values="(0,1,2,3,4,5)" MinValue="2" />
+<com:TSlider id="vSlider" Direction="Vertical" Enabled="true" Values="(-2,-1,0,1,6,2,7,3,4,5)" />
  <com:TButton onclick="testsubmit" text="Submit"/>
 
 <br/>
-<com:TSlider />
+<com:TSlider StepSize="0.1"/>
 <p>
 Results :<br/>
 Horizontal Slider value : <com:TLabel id="hSliderResult"/><br/>
