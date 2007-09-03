@@ -18,7 +18,7 @@
  * a value in the range. The track can be either Horizontal or Vertical, depending of the {@link SetDirection Direction}
  * property. By default, it's horizontal.
  *
- * The range boundaries is defined by {@link SetMinValue MinValue} and {@link SetMaxValue MaxValue} properties. 
+ * The range boundaries are defined by {@link SetMinValue MinValue} and {@link SetMaxValue MaxValue} properties. 
  * The default range is from 0 to 100. 
  * The {@link SetStepSize StepSize} property can be used to define the <b>step</b> between 2 values inside the range.
  * Notice that this step will be recomputed if there is more than 200 values between the range boundaries.
