@@ -1,0 +1,49 @@
+.hslider
+{
+	background-color: rgb(170,170,170);
+	width: 200px;
+	height: 5px;
+}
+
+.vslider
+{
+	background-color: rgb(170,170,170);
+	width: 5px;
+	height: 200px;
+}
+
+.handle
+{
+	background-color: red;
+	cursor: move;
+}
+
+.hslider .handle
+{
+	width: 5px;
+	height: 10px;
+}
+
+.vslider .handle
+{
+	width: 10px;
+	height: 5px;
+}
+
+.handle-image
+{
+	width: 14px;
+	height: 15px;
+	cursor: move;
+	background: url("TSliderHandle.png") no-repeat;
+}
+
+.hslider .handle-image
+{
+	top: -5px; /* Center the image on the track */
+}
+
+.vslider .handle-image
+{
+	left: -5px;
+}
