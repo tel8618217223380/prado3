@@ -1,15 +1,19 @@
 <?php
 class Home extends TPage 
 {
-	public function testsubmit ($sender, $param)
+	public function submit1 ($sender, $param)
 	{
-		$this->hSliderResult->setText('submit : '.$this->hSlider->getValue());	
-		$this->vSliderResult->setText('submit : '.$this->vSlider->getValue());
+		$this->slider1Result->setText('Slider Value : '.$this->slider1->getValue());	
 	}
 	
-	public function sliderChanged ($sender, $param)
+	public function slider2Changed ($sender, $param)
 	{
-		$this->hSliderResult->setText('onSliderChanged : '.$sender->getValue());
+		$this->slider2Result->setText('onSliderChanged, Value : '.$sender->getValue());
+	}
+	
+	public function slider3Changed ($sender, $param)
+	{
+		$this->slider3Result->setText('onSliderChanged, Value : '.$sender->getValue());
 	}
 }
 ?>
