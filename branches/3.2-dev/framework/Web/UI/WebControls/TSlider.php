@@ -497,7 +497,7 @@ class TSliderClientScript extends TClientSideOptions
 	/**
 	 * @return string javascript code to execute when the slider value is changed.
 	 */
-	public function getOnChanged()
+	public function getOnChange()
 	{
 		return $this->getOption('onChange');
 	}
