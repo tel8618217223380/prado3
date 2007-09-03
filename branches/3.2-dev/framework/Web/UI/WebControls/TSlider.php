@@ -386,7 +386,13 @@ class TSlider extends TWebControl implements IPostBackDataHandler
 	protected function registerStyleSheet()
 	{
 		if(($url=$this->getCssUrl())==='')
-		$url=$this->getApplication()->getAssetManager()->publishFilePath(dirname(__FILE__).DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'TSlider.css');
+		{
+			// publish the handle image
+			$this->getApplication()->getAssetManager()->publishFilePath(dirname(__FILE__).DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'TSliderHandle.png');
+			// publish the css file
+			$url=$this->getApplication()->getAssetManager()->publishFilePath(dirname(__FILE__).DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'TSlider.css');
+			
+		}
 		$this->getPage()->getClientScript()->registerStyleSheetFile($url,$url);
 	}
 
