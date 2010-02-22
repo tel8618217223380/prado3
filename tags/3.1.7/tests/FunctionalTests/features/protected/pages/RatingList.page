@@ -1,0 +1,41 @@
+<com:TContent ID="Content">
+<h1>TRatingList Examples</h1>
+
+<h2>Default TRatingList</h2>
+	<com:TRatingList RepeatDirection="Vertical" Style="caption-side: right;">
+		<com:TListItem Text="Fair" />
+		<com:TListItem Text="Average" />
+		<com:TListItem Text="Good" />
+		<com:TListItem Text="Execellent" />
+	</com:TRatingList>
+
+<h2>TRatingList </h2>
+	<com:TRatingList SelectedIndex="2">
+		<com:TListItem Text="Poor" />
+		<com:TListItem Text="Fair" />
+		<com:TListItem Text="Average" />
+		<com:TListItem Text="Good" />
+		<com:TListItem Text="Execellent" />
+		<com:TListItem Text="Super" />
+	</com:TRatingList>
+
+<h2>TRatingList </h2>
+	<com:TRatingList RatingStyle="blocks" SelectedValue="Good">
+		<com:TListItem Text="Poor" />
+		<com:TListItem Text="Fair" />
+		<com:TListItem Text="Average" />
+		<com:TListItem Text="Good" />
+		<com:TListItem Text="Execellent" />
+		<com:TListItem Text="Super" />
+	</com:TRatingList>
+
+<h2>TRatingList </h2>
+	<com:TRatingList ID="Rating1" AllowInput="false" Caption="Rating:" Rating="4.6">
+		<com:TListItem Text="Poor" />
+		<com:TListItem Text="Fair" />
+		<com:TListItem Text="Average" />
+		<com:TListItem Text="Good" />
+		<com:TListItem Text="Execellent" />
+		<com:TListItem Text="Super" />
+	</com:TRatingList>		
+</com:TContent>
