@@ -1,5 +1,0 @@
-<com:TContent ID="Content">
-
-	<com:TDropDownList ID="DropDownList" PromptText="Choose..."/>
-	
-</com:TContent>

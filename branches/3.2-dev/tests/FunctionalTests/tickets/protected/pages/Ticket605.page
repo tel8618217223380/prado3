@@ -1,5 +1,0 @@
-<com:TContent ID="Content">
-
-<com:TDatePicker DateFormat="yyyy-MM-dd" Mode="ImageButton" ID="from" />
-
-</com:TContent>
