@@ -1,0 +1,5 @@
+= Source =
+
+Prado's source code repository has been moved to the project's [http://github.com/pradosoft/prado github page].
+
+Please note that the old repository on google code won't be updated anymore.
